@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package yolocs.wrappers;
+
+import "google/protobuf/descriptor.proto";
+import "google/cloud/audit/audit_log.proto";
+import "google/logging/v2/log_entry.proto";
+
+option go_package = "github.com/yolocs/proto-import/pkg/wrappers";
+
+extend google.protobuf.EnumValueOptions {
+  string log_name_suffix = 11716886;
+}
+
+message AuditRecord {
+  enum LogType {
+    UNSPECIFIED = 0 [(log_name_suffix) = "google.lumberjack.audit/unspecified"];
+
+    // Administrative actions or changes to configuration through public APIs.
+    ADMIN_ACTIVITY = 1 [(log_name_suffix) = "google.lumberjack.audit/activity"];
+
+    // Administrative actions or changes to configuration initiated by internal
+    // system not through public APIs.
+    SYSTEM_EVENT = 2
+        [(log_name_suffix) = "google.lumberjack.audit/system_event"];
+
+    // Reads of configuration data and all access to user data through public
+    // APIs.
+    DATA_ACCESS = 3 [(log_name_suffix) = "google.lumberjack.audit/data_access"];
+  }
+
+  LogType log_type = 1;
+
+  google.cloud.audit.AuditLog log = 4;
+
+  google.logging.v2.LogEntryOperation operation = 5;
+
+  map<string, string> labels = 3;
+}
